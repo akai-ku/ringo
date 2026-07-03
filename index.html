@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#c0392b">
+  <title>ringo — 併読ノート</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>🍎 ringo <span class="subtitle">併読ノート</span></h1>
+    <div class="header-actions">
+      <button id="scan-btn" class="btn btn-primary">📷 バーコードで追加</button>
+      <button id="manual-add-btn" class="btn">✏️ 手動で追加</button>
+    </div>
+  </header>
+
+  <nav class="filter-tabs" id="filter-tabs">
+    <button class="tab active" data-filter="reading">読書中</button>
+    <button class="tab" data-filter="paused">中断中</button>
+    <button class="tab" data-filter="finished">読了</button>
+    <button class="tab" data-filter="all">すべて</button>
+  </nav>
+
+  <main>
+    <p id="empty-message" class="empty-message hidden"></p>
+    <ul id="book-list" class="book-list"></ul>
+  </main>
+
+  <!-- バーコードスキャナ -->
+  <dialog id="scanner-dialog" class="dialog">
+    <h2>バーコードをスキャン</h2>
+    <p class="hint">本の裏表紙の上段バーコード(978 / 979 で始まるISBN)にカメラを向けてください。</p>
+    <div class="video-wrap">
+      <video id="scanner-video" playsinline muted></video>
+      <div class="scan-line"></div>
+    </div>
+    <p id="scanner-status" class="scanner-status"></p>
+    <form id="isbn-form" class="isbn-form">
+      <input id="isbn-input" type="text" inputmode="numeric" placeholder="ISBNを直接入力 (例: 9784101010014)">
+      <button type="submit" class="btn">検索</button>
+    </form>
+    <div class="dialog-actions">
+      <button id="scanner-close" class="btn">閉じる</button>
+    </div>
+  </dialog>
+
+  <!-- 本の追加・編集フォーム -->
+  <dialog id="book-dialog" class="dialog">
+    <h2 id="book-dialog-title">本を追加</h2>
+    <form id="book-form">
+      <input type="hidden" id="book-id">
+      <label>タイトル <span class="required">*</span>
+        <input type="text" id="book-title" required>
+      </label>
+      <label>著者
+        <input type="text" id="book-author">
+      </label>
+      <label>出版社
+        <input type="text" id="book-publisher">
+      </label>
+      <label>ISBN
+        <input type="text" id="book-isbn" inputmode="numeric">
+      </label>
+      <div class="form-row">
+        <label>現在のページ
+          <input type="number" id="book-current-page" min="0" value="0">
+        </label>
+        <label>総ページ数
+          <input type="number" id="book-total-pages" min="0" value="0">
+        </label>
+      </div>
+      <label>メモ
+        <textarea id="book-notes" rows="3"></textarea>
+      </label>
+      <div class="dialog-actions">
+        <button type="button" id="book-form-cancel" class="btn">キャンセル</button>
+        <button type="submit" class="btn btn-primary">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,317 @@
+:root {
+  --accent: #c0392b;
+  --accent-soft: #fdecea;
+  --bg: #faf7f2;
+  --card-bg: #ffffff;
+  --text: #2c2c2c;
+  --text-sub: #777;
+  --border: #e4ddd3;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--text-sub);
+  font-weight: normal;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn:hover { filter: brightness(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-small {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.btn-danger { color: var(--accent); }
+
+.filter-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem 0;
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: transparent;
+  color: var(--text-sub);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tab.active {
+  background: var(--card-bg);
+  color: var(--accent);
+  font-weight: bold;
+}
+
+main { padding: 1rem; max-width: 720px; margin: 0 auto; }
+
+.empty-message {
+  text-align: center;
+  color: var(--text-sub);
+  padding: 3rem 1rem;
+}
+
+.hidden { display: none !important; }
+
+.book-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.book-card {
+  display: flex;
+  gap: 0.9rem;
+  padding: 0.9rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.book-cover {
+  width: 64px;
+  height: 92px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--border);
+}
+
+.book-cover-placeholder {
+  width: 64px;
+  height: 92px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  border-radius: 4px;
+  background: var(--accent-soft);
+}
+
+.book-body { flex: 1; min-width: 0; }
+
+.book-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.book-meta {
+  margin: 0.1rem 0 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-sub);
+}
+
+.stale-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0 0.45rem;
+  font-size: 0.72rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.2s;
+}
+
+.progress-label {
+  font-size: 0.78rem;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.page-input {
+  width: 4.5rem;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.book-notes {
+  margin: 0.3rem 0;
+  font-size: 0.82rem;
+  color: var(--text-sub);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.book-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+/* ダイアログ */
+.dialog {
+  width: min(480px, 92vw);
+  border: none;
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+.dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+
+.dialog h2 { margin-top: 0; font-size: 1.1rem; }
+
+.dialog label {
+  display: block;
+  margin-bottom: 0.7rem;
+  font-size: 0.85rem;
+}
+
+.dialog input[type="text"],
+.dialog input[type="number"],
+.dialog textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.2rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.form-row { display: flex; gap: 0.75rem; }
+.form-row label { flex: 1; }
+
+.required { color: var(--accent); }
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.hint { font-size: 0.8rem; color: var(--text-sub); }
+
+/* スキャナ */
+.video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+#scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scan-line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 2px;
+  background: rgba(255, 60, 60, 0.85);
+  box-shadow: 0 0 8px rgba(255, 60, 60, 0.9);
+}
+
+.scanner-status {
+  min-height: 1.4em;
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.isbn-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.isbn-form input {
+  flex: 1;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 480px) {
+  .header-actions { width: 100%; }
+  .header-actions .btn { flex: 1; }
+}
