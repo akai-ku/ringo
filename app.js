@@ -458,6 +458,150 @@ function renderBookCard(book) {
 }
 
 // ---------------------------------------------------------------------------
+// スプレッドシート同期 (Google Apps Script 経由。設定手順は docs/sheets-sync-setup.md)
+// ---------------------------------------------------------------------------
+
+const SYNC_STORAGE_KEY = "ringo.sync.v1";
+
+const syncDialog = document.getElementById("sync-dialog");
+const syncStatus = document.getElementById("sync-status");
+const syncConfigDetails = document.getElementById("sync-config");
+const syncPushBtn = document.getElementById("sync-push");
+const syncPullBtn = document.getElementById("sync-pull");
+
+function loadSyncConfig() {
+  try {
+    return JSON.parse(localStorage.getItem(SYNC_STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveSyncConfig(config) {
+  localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(config));
+}
+
+function isSyncConfigured() {
+  const config = loadSyncConfig();
+  return Boolean(config.url && config.key);
+}
+
+function openSyncDialog() {
+  const config = loadSyncConfig();
+  document.getElementById("sync-url").value = config.url || "";
+  document.getElementById("sync-key").value = config.key || "";
+  updateSyncUi();
+  syncDialog.showModal();
+}
+
+function updateSyncUi() {
+  const configured = isSyncConfigured();
+  syncPushBtn.disabled = !configured;
+  syncPullBtn.disabled = !configured;
+  syncConfigDetails.open = !configured;
+  if (!configured) {
+    setSyncStatus("最初に下の「接続設定」からURLと合言葉を設定してください。");
+  } else {
+    const { lastSyncAt } = loadSyncConfig();
+    setSyncStatus(
+      lastSyncAt
+        ? `前回の同期: ${new Date(lastSyncAt).toLocaleString("ja-JP")}`
+        : "設定済みです。保存または読み込みを実行できます。"
+    );
+  }
+}
+
+function setSyncStatus(text) {
+  syncStatus.textContent = text;
+}
+
+async function callSheetApi(payload) {
+  const { url, key } = loadSyncConfig();
+  // Content-Type を text/plain にすると CORS のプリフライトが発生せず、
+  // Apps Script のウェブアプリにそのまま届く
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify({ key, ...payload }),
+  });
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error(
+      "スプレッドシートからの応答を読み取れませんでした。URLとデプロイ設定(アクセス: 全員)を確認してください。"
+    );
+  }
+  if (!data.ok) throw new Error(data.error || "不明なエラー");
+  return data;
+}
+
+function markSynced() {
+  const config = loadSyncConfig();
+  config.lastSyncAt = new Date().toISOString();
+  saveSyncConfig(config);
+}
+
+async function pushToSheet() {
+  syncPushBtn.disabled = true;
+  setSyncStatus("スプレッドシートに保存しています…");
+  try {
+    const data = await callSheetApi({ action: "save", books });
+    markSynced();
+    setSyncStatus(`✅ ${data.count}冊をスプレッドシートに保存しました。`);
+  } catch (err) {
+    setSyncStatus(`保存に失敗しました: ${err.message}`);
+  } finally {
+    syncPushBtn.disabled = false;
+  }
+}
+
+async function pullFromSheet() {
+  syncPullBtn.disabled = true;
+  setSyncStatus("スプレッドシートから読み込んでいます…");
+  try {
+    const data = await callSheetApi({ action: "load" });
+    const incoming = Array.isArray(data.books) ? data.books : [];
+    const message =
+      `スプレッドシートの${incoming.length}冊で、` +
+      `この端末の${books.length}冊を置き換えます。よろしいですか?`;
+    if (!confirm(message)) {
+      setSyncStatus("読み込みをキャンセルしました。");
+      return;
+    }
+    books = incoming;
+    saveBooks();
+    render();
+    markSynced();
+    setSyncStatus(`✅ ${incoming.length}冊を読み込みました。`);
+  } catch (err) {
+    setSyncStatus(`読み込みに失敗しました: ${err.message}`);
+  } finally {
+    syncPullBtn.disabled = false;
+  }
+}
+
+document.getElementById("sync-btn").addEventListener("click", openSyncDialog);
+document.getElementById("sync-close").addEventListener("click", () => syncDialog.close());
+syncPushBtn.addEventListener("click", pushToSheet);
+syncPullBtn.addEventListener("click", pullFromSheet);
+
+document.getElementById("sync-config-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const url = document.getElementById("sync-url").value.trim();
+  const key = document.getElementById("sync-key").value.trim();
+  if (!url || !key) {
+    setSyncStatus("URLと合言葉の両方を入力してください。");
+    return;
+  }
+  const config = loadSyncConfig();
+  saveSyncConfig({ ...config, url, key });
+  syncConfigDetails.open = false;
+  updateSyncUi();
+  setSyncStatus("設定を保存しました。まず「スプレッドシートに保存」を試してください。");
+});
+
+// ---------------------------------------------------------------------------
 // イベント
 // ---------------------------------------------------------------------------
 
