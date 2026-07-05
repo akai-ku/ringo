@@ -13,6 +13,7 @@
     <div class="header-actions">
       <button id="scan-btn" class="btn btn-primary">📷 バーコードで追加</button>
       <button id="manual-add-btn" class="btn">✏️ 手動で追加</button>
+      <button id="sync-btn" class="btn">☁️ 同期</button>
     </div>
   </header>
 
@@ -79,6 +80,36 @@
         <button type="submit" class="btn btn-primary">保存</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- スプレッドシート同期 -->
+  <dialog id="sync-dialog" class="dialog">
+    <h2>☁️ スプレッドシート同期</h2>
+    <div class="sync-actions">
+      <button id="sync-push" class="btn btn-primary">📤 スプレッドシートに保存</button>
+      <button id="sync-pull" class="btn">📥 スプレッドシートから読み込み</button>
+      <p id="sync-status" class="sync-status"></p>
+    </div>
+    <details id="sync-config">
+      <summary>接続設定</summary>
+      <form id="sync-config-form">
+        <label>Apps ScriptのURL
+          <input type="url" id="sync-url" placeholder="https://script.google.com/macros/s/…/exec">
+        </label>
+        <label>合言葉
+          <input type="text" id="sync-key" placeholder="Apps Scriptに設定したものと同じ">
+        </label>
+        <button type="submit" class="btn">設定を保存</button>
+      </form>
+      <p class="hint">
+        初回のセットアップ手順は
+        <a href="https://github.com/akai-ku/ringo/blob/main/docs/sheets-sync-setup.md" target="_blank" rel="noopener">こちらの手順書</a>
+        を見てください(10分ほどで終わります)。
+      </p>
+    </details>
+    <div class="dialog-actions">
+      <button id="sync-close" class="btn">閉じる</button>
+    </div>
   </dialog>
 
   <script src="app.js"></script>
