@@ -13,7 +13,8 @@
     <div class="header-actions">
       <button id="scan-btn" class="btn btn-primary">📷 バーコードで追加</button>
       <button id="manual-add-btn" class="btn">✏️ 手動で追加</button>
-      <button id="sync-btn" class="btn">☁️ 同期</button>
+      <button id="save-btn" class="btn">💾 保存</button>
+      <button id="sync-settings-btn" class="btn" aria-label="スプレッドシート連携の設定">⚙️</button>
     </div>
   </header>
 
@@ -106,12 +107,15 @@
     </form>
   </dialog>
 
-  <!-- スプレッドシート同期 -->
+  <!-- スプレッドシート連携 -->
   <dialog id="sync-dialog" class="dialog">
-    <h2>☁️ スプレッドシート同期</h2>
+    <h2>☁️ スプレッドシート連携</h2>
+    <p class="hint">
+      ページを開くと自動で最新データを読み込みます。
+      変更したら「💾 保存」を押してください。
+    </p>
     <div class="sync-actions">
-      <button id="sync-push" class="btn btn-primary">📤 スプレッドシートに保存</button>
-      <button id="sync-pull" class="btn">📥 スプレッドシートから読み込み</button>
+      <button id="sync-pull" class="btn">📥 いますぐ読み込み直す</button>
       <p id="sync-status" class="sync-status"></p>
     </div>
     <details id="sync-config">
@@ -135,6 +139,8 @@
       <button id="sync-close" class="btn">閉じる</button>
     </div>
   </dialog>
+
+  <div id="toast" class="toast" role="status"></div>
 
   <script src="app.js"></script>
 </body>
