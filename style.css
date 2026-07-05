@@ -228,6 +228,12 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
   font-size: 0.85rem;
 }
 
+.book-dates {
+  margin: 0.15rem 0;
+  font-size: 0.78rem;
+  color: var(--text-sub);
+}
+
 .book-notes {
   margin: 0.3rem 0;
   font-size: 0.82rem;
@@ -264,6 +270,7 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
 .dialog input[type="text"],
 .dialog input[type="number"],
 .dialog input[type="url"],
+.dialog input[type="date"],
 .dialog select,
 .dialog textarea {
   display: block;

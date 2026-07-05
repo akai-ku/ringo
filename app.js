@@ -26,10 +26,31 @@ const SOURCE_LABELS = {
 function loadBooks() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const list = raw ? JSON.parse(raw) : [];
+    return list.map(migrateBook);
   } catch {
     return [];
   }
+}
+
+/** 日付フィールドが無い既存データに補完する */
+function migrateBook(book) {
+  if (!book.startedAt) {
+    book.startedAt = toLocalDateStr(new Date(book.addedAt || Date.now()));
+  }
+  if (book.endedAt == null) {
+    book.endedAt =
+      book.status === "finished" || book.status === "paused"
+        ? toLocalDateStr(new Date(book.lastReadAt || Date.now()))
+        : "";
+  }
+  return book;
+}
+
+/** ローカル時刻での YYYY-MM-DD 文字列 */
+function toLocalDateStr(date = new Date()) {
+  const d = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return d.toISOString().slice(0, 10);
 }
 
 function saveBooks() {
@@ -56,6 +77,8 @@ function createBook(fields) {
     notes: "",
     addedAt: now,
     lastReadAt: now,
+    startedAt: toLocalDateStr(), // 読み始めた日(初期値は登録日、編集可)
+    endedAt: "", // 読了・中断ボタンを押した日(編集可)
     ...fields,
   };
 }
@@ -343,6 +366,10 @@ function openBookForm(book = {}) {
   document.getElementById("book-source").value = book.source || "";
   document.getElementById("book-current-page").value = book.currentPage || 0;
   document.getElementById("book-total-pages").value = book.totalPages || 0;
+  document.getElementById("book-started").value = book.id
+    ? (book.startedAt || "").slice(0, 10)
+    : toLocalDateStr();
+  document.getElementById("book-ended").value = (book.endedAt || "").slice(0, 10);
   document.getElementById("book-notes").value = book.notes || "";
   bookDialog.showModal();
 }
@@ -358,6 +385,8 @@ bookForm.addEventListener("submit", (e) => {
     source: document.getElementById("book-source").value,
     currentPage: Math.max(0, Number(document.getElementById("book-current-page").value) || 0),
     totalPages: Math.max(0, Number(document.getElementById("book-total-pages").value) || 0),
+    startedAt: document.getElementById("book-started").value || toLocalDateStr(),
+    endedAt: document.getElementById("book-ended").value || "",
     notes: document.getElementById("book-notes").value.trim(),
   };
   if (!fields.title) return;
@@ -384,6 +413,20 @@ function escapeHtml(text) {
 
 function daysSince(isoDate) {
   return Math.floor((Date.now() - new Date(isoDate).getTime()) / 86400000);
+}
+
+function formatDate(dateStr) {
+  return dateStr ? dateStr.slice(0, 10).replaceAll("-", "/") : "";
+}
+
+function renderDates(book) {
+  const parts = [];
+  if (book.startedAt) parts.push(`📖 開始 ${formatDate(book.startedAt)}`);
+  if (book.endedAt) {
+    const label = book.status === "finished" ? "読了" : "中断";
+    parts.push(`🏁 ${label} ${formatDate(book.endedAt)}`);
+  }
+  return parts.length ? `<p class="book-dates">${parts.join(" ・ ")}</p>` : "";
 }
 
 function visibleBooks() {
@@ -467,6 +510,7 @@ function renderBookCard(book) {
             : ""
         }</p>
         ${progressRow}
+        ${renderDates(book)}
         ${book.notes ? `<p class="book-notes">${escapeHtml(book.notes)}</p>` : ""}
         <div class="book-actions">
           ${statusButtons}
@@ -581,7 +625,7 @@ async function pullFromSheet() {
   setSyncStatus("スプレッドシートから読み込んでいます…");
   try {
     const data = await callSheetApi({ action: "load" });
-    const incoming = Array.isArray(data.books) ? data.books : [];
+    const incoming = (Array.isArray(data.books) ? data.books : []).map(migrateBook);
     const message =
       `スプレッドシートの${incoming.length}冊で、` +
       `この端末の${books.length}冊を置き換えます。よろしいですか?`;
@@ -673,15 +717,20 @@ bookList.addEventListener("click", (e) => {
 
   switch (action) {
     case "pause":
-      updateBook(id, { status: "paused" });
+      updateBook(id, { status: "paused", endedAt: toLocalDateStr() });
       break;
     case "resume":
-      updateBook(id, { status: "reading", lastReadAt: new Date().toISOString() });
+      updateBook(id, {
+        status: "reading",
+        endedAt: "",
+        lastReadAt: new Date().toISOString(),
+      });
       break;
     case "finish":
       updateBook(id, {
         status: "finished",
         currentPage: book.totalPages || book.currentPage,
+        endedAt: toLocalDateStr(),
         lastReadAt: new Date().toISOString(),
       });
       break;
