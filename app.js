@@ -15,6 +15,14 @@ const STATUS_LABELS = {
   finished: "読了",
 };
 
+/** 本の種別(入手経路)。値は文字列で保存するので、将来の追加も容易 */
+const SOURCE_LABELS = {
+  library: "🏛️ 図書館",
+  owned: "📕 所有本",
+  kindle: "📱 Kindle",
+  audible: "🎧 Audible",
+};
+
 function loadBooks() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -30,6 +38,7 @@ function saveBooks() {
 
 let books = loadBooks();
 let currentFilter = "reading";
+let currentSourceFilter = "";
 
 function createBook(fields) {
   const now = new Date().toISOString();
@@ -43,6 +52,7 @@ function createBook(fields) {
     currentPage: 0,
     totalPages: 0,
     status: "reading",
+    source: "",
     notes: "",
     addedAt: now,
     lastReadAt: now,
@@ -330,6 +340,7 @@ function openBookForm(book = {}) {
   document.getElementById("book-author").value = book.author || "";
   document.getElementById("book-publisher").value = book.publisher || "";
   document.getElementById("book-isbn").value = book.isbn || "";
+  document.getElementById("book-source").value = book.source || "";
   document.getElementById("book-current-page").value = book.currentPage || 0;
   document.getElementById("book-total-pages").value = book.totalPages || 0;
   document.getElementById("book-notes").value = book.notes || "";
@@ -344,6 +355,7 @@ bookForm.addEventListener("submit", (e) => {
     author: document.getElementById("book-author").value.trim(),
     publisher: document.getElementById("book-publisher").value.trim(),
     isbn: normalizeIsbn(document.getElementById("book-isbn").value),
+    source: document.getElementById("book-source").value,
     currentPage: Math.max(0, Number(document.getElementById("book-current-page").value) || 0),
     totalPages: Math.max(0, Number(document.getElementById("book-total-pages").value) || 0),
     notes: document.getElementById("book-notes").value.trim(),
@@ -375,10 +387,13 @@ function daysSince(isoDate) {
 }
 
 function visibleBooks() {
-  const list =
+  let list =
     currentFilter === "all"
       ? books.slice()
       : books.filter((b) => b.status === currentFilter);
+  if (currentSourceFilter) {
+    list = list.filter((b) => b.source === currentSourceFilter);
+  }
   if (currentFilter === "reading") {
     // 併読リストは「長く触れていない本」ほど上に出して読み残しを防ぐ
     list.sort((a, b) => new Date(a.lastReadAt) - new Date(b.lastReadAt));
@@ -396,7 +411,9 @@ const EMPTY_MESSAGES = {
 function render() {
   const list = visibleBooks();
   emptyMessage.classList.toggle("hidden", list.length > 0);
-  emptyMessage.textContent = EMPTY_MESSAGES[currentFilter];
+  emptyMessage.textContent = currentSourceFilter
+    ? "この種別の本はありません。"
+    : EMPTY_MESSAGES[currentFilter];
   bookList.innerHTML = list.map(renderBookCard).join("");
 }
 
@@ -413,6 +430,9 @@ function renderBookCard(book) {
   const meta = [book.author, book.publisher].filter(Boolean).join(" / ");
   const staleBadge = stale
     ? `<span class="stale-badge">${daysSince(book.lastReadAt)}日読んでいません</span>`
+    : "";
+  const sourceBadge = SOURCE_LABELS[book.source]
+    ? `<span class="source-badge">${SOURCE_LABELS[book.source]}</span>`
     : "";
 
   const progressRow =
@@ -441,7 +461,7 @@ function renderBookCard(book) {
       ${cover}
       <div class="book-body">
         <h3 class="book-title">${escapeHtml(book.title)}${staleBadge}</h3>
-        <p class="book-meta">${escapeHtml(meta)}${
+        <p class="book-meta">${escapeHtml(meta)}${sourceBadge}${
           currentFilter === "all"
             ? ` <span class="stale-badge">${STATUS_LABELS[book.status]}</span>`
             : ""
@@ -627,6 +647,11 @@ document.getElementById("isbn-form").addEventListener("submit", async (e) => {
   }
   input.value = "";
   await registerByIsbn(isbn13);
+});
+
+document.getElementById("source-filter").addEventListener("change", (e) => {
+  currentSourceFilter = e.target.value;
+  render();
 });
 
 document.getElementById("filter-tabs").addEventListener("click", (e) => {
