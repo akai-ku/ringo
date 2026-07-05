@@ -25,6 +25,8 @@ const HEADERS = [
   "notes",
   "addedAt",
   "lastReadAt",
+  "startedAt",
+  "endedAt",
 ];
 
 function doPost(e) {
@@ -91,6 +93,8 @@ function loadBooks() {
       b.totalPages = Number(b.totalPages) || 0;
       b.addedAt = toIso(b.addedAt);
       b.lastReadAt = toIso(b.lastReadAt);
+      b.startedAt = toDateStr(b.startedAt);
+      b.endedAt = toDateStr(b.endedAt);
       return b;
     });
   return json({ ok: true, books: books });
@@ -106,6 +110,18 @@ function toIso(value) {
   if (value instanceof Date) return value.toISOString();
   const s = String(value || "");
   return s || new Date().toISOString();
+}
+
+/** YYYY-MM-DD 形式の文字列に戻す(空欄は空のまま) */
+function toDateStr(value) {
+  if (value instanceof Date) {
+    return Utilities.formatDate(
+      value,
+      Session.getScriptTimeZone(),
+      "yyyy-MM-dd"
+    );
+  }
+  return String(value || "").slice(0, 10);
 }
 
 function json(obj) {

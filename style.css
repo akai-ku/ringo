@@ -228,6 +228,12 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
   font-size: 0.85rem;
 }
 
+.book-dates {
+  margin: 0.15rem 0;
+  font-size: 0.78rem;
+  color: var(--text-sub);
+}
+
 .book-notes {
   margin: 0.3rem 0;
   font-size: 0.82rem;
@@ -264,6 +270,7 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
 .dialog input[type="text"],
 .dialog input[type="number"],
 .dialog input[type="url"],
+.dialog input[type="date"],
 .dialog select,
 .dialog textarea {
   display: block;
@@ -362,6 +369,26 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
   color: var(--text-sub);
   margin-bottom: 0.6rem;
 }
+
+/* トースト通知 */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  max-width: 90vw;
+  padding: 0.55rem 1rem;
+  background: rgba(40, 40, 40, 0.92);
+  color: #fff;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 100;
+}
+
+.toast.show { opacity: 1; }
 
 @media (max-width: 480px) {
   .header-actions { width: 100%; }
