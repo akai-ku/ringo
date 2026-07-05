@@ -169,6 +169,29 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
   border-radius: 999px;
 }
 
+.source-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0 0.45rem;
+  font-size: 0.72rem;
+  color: var(--text-sub);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.source-filter {
+  margin-left: auto;
+  align-self: center;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  color: var(--text-sub);
+  font-size: 0.85rem;
+}
+
 .progress-row {
   display: flex;
   align-items: center;
@@ -240,6 +263,8 @@ main { padding: 1rem; max-width: 720px; margin: 0 auto; }
 
 .dialog input[type="text"],
 .dialog input[type="number"],
+.dialog input[type="url"],
+.dialog select,
 .dialog textarea {
   display: block;
   width: 100%;

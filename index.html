@@ -22,6 +22,13 @@
     <button class="tab" data-filter="paused">中断中</button>
     <button class="tab" data-filter="finished">読了</button>
     <button class="tab" data-filter="all">すべて</button>
+    <select id="source-filter" class="source-filter" aria-label="種別で絞り込み">
+      <option value="">全種別</option>
+      <option value="library">🏛️ 図書館</option>
+      <option value="owned">📕 所有本</option>
+      <option value="kindle">📱 Kindle</option>
+      <option value="audible">🎧 Audible</option>
+    </select>
   </nav>
 
   <main>
@@ -63,6 +70,15 @@
       </label>
       <label>ISBN
         <input type="text" id="book-isbn" inputmode="numeric">
+      </label>
+      <label>種別
+        <select id="book-source">
+          <option value="">未設定</option>
+          <option value="library">🏛️ 図書館</option>
+          <option value="owned">📕 所有本</option>
+          <option value="kindle">📱 Kindle</option>
+          <option value="audible">🎧 Audible</option>
+        </select>
       </label>
       <div class="form-row">
         <label>現在のページ

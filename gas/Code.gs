@@ -21,6 +21,7 @@ const HEADERS = [
   "currentPage",
   "totalPages",
   "status",
+  "source",
   "notes",
   "addedAt",
   "lastReadAt",
@@ -85,6 +86,7 @@ function loadBooks() {
       b.cover = String(b.cover || "");
       b.notes = String(b.notes || "");
       b.status = String(b.status || "reading");
+      b.source = String(b.source || "");
       b.currentPage = Number(b.currentPage) || 0;
       b.totalPages = Number(b.totalPages) || 0;
       b.addedAt = toIso(b.addedAt);
